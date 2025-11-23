@@ -1,0 +1,30 @@
+version: '3.8'  # Use Docker Compose version 3.8
+
+services:
+  # First service: our web application
+  web:
+    # Use the image that was built automatically with CI/CD
+    image: ehsansetaregan/german-devops-start:latest
+    ports:
+      - "5000:5000"   # Map container port 5000 to local port 5000
+    environment:
+      # Environment variable for connecting to the PostgreSQL database
+      - DATABASE_URL=postgresql://user:password@db:5432/appdb
+    depends_on:
+      - db  # Make sure the database starts before the web service
+
+  # Second service: PostgreSQL Database
+  db:
+    image: postgres:15-alpine  # Use a lightweight PostgreSQL image (Alpine version)
+    environment:
+      - POSTGRES_USER=user        # Database username
+      - POSTGRES_PASSWORD=password  # Database password
+      - POSTGRES_DB=appdb          # Name of the default database
+    volumes:
+      # Store database data on the host so data is not lost when the container stops
+      - postgres_data:/var/lib/postgresql/data/
+
+# Define the volume for storing persistent database data
+volumes:
+  postgres_data:
+
